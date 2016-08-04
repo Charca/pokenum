@@ -22,6 +22,7 @@ const askPokemon = (convo) => {
     }])
   );
   const answer = (payload, convo) => {
+    if (!payload.message) { convo.end(); }
     const score = convo.get('score') || 0;
     if (payload.message.text === convo.get('currentPokemon').toString()) {
       convo.set('score', score + 1);
@@ -37,18 +38,30 @@ const askPokemon = (convo) => {
   convo.ask(question, answer);
 };
 
-bot.hear([`start`, `play`, /let(')?s play/i], (payload, chat) => {
+const newGameMenu = (payload, chat) => {
   chat.say(`Let's see how much you know about Pokémon...`, { typing: true })
     .then(() => chat.conversation(askPokemon));
-});
+};
 
-bot.hear(['help', 'help me'], (payload, chat) => {
+const helpMenu = (payload, chat) => {
   chat.say(`Just type START or PLAY to get started!`, { typing : true });
-});
+};
+
+bot.hear([`start`, `play`, /let(')?s play/i], newGameMenu);
+
+bot.hear(['help', 'help me'], helpMenu);
 
 bot.setGetStartedButton((payload, chat) => {
   chat.say(`Hey there, trainer! How well you think you know your Pokémon?.`, { typing: true })
     .then(() => chat.say(`Type START or PLAY to join the challenge!`, { typing: true }));
 });
+
+bot.setPersistentMenu([
+  { type: 'postback', title: 'New Game', payload: 'MENU_NEW_GAME' },
+  { type: 'postback', title: 'Help', payload: 'MENU_HELP' }
+]);
+
+bot.on('postback:MENU_NEW_GAME', newGameMenu);
+bot.on('postback:MENU_HELP', helpMenu);
 
 bot.start(config.get('bot_port'));
