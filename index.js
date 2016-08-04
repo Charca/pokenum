@@ -37,9 +37,18 @@ const askPokemon = (convo) => {
   convo.ask(question, answer);
 };
 
-bot.hear([`start`, `play`, /let(\')?s play/], (payload, chat) => {
-  chat.say(`Let's see how much you know about Pokémon!`, { typing: true })
+bot.hear([`start`, `play`, /let(')?s play/i], (payload, chat) => {
+  chat.say(`Let's see how much you know about Pokémon...`, { typing: true })
     .then(() => chat.conversation(askPokemon));
+});
+
+bot.hear(['help', 'help me'], (payload, chat) => {
+  chat.say(`Just type START or PLAY to get started!`, { typing : true });
+});
+
+bot.setGetStartedButton((payload, chat) => {
+  chat.say(`Hey there, trainer! How well you think you know your Pokémon?.`, { typing: true })
+    .then(() => chat.say(`Type START or PLAY to join the challenge!`, { typing: true }));
 });
 
 bot.start(config.get('bot_port'));
