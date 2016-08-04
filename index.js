@@ -23,13 +23,15 @@ const askPokemon = (convo) => {
   );
   const answer = (payload, convo) => {
     if (!payload.message) { convo.end(); }
+    const options = { typing: true };
     const score = convo.get('score') || 0;
-    if (payload.message.text === convo.get('currentPokemon').toString()) {
+    const currentPokemon = convo.get('currentPokemon').toString();
+    if (payload.message.text === currentPokemon) {
       convo.set('score', score + 1);
-      convo.say('Correct! Try another one:', { typing: true })
+      convo.say('Correct! Try another one:', options)
         .then(() => askPokemon(convo));
     } else {
-      convo.say(`Nope! That Pokémon is actually #${randomID}`, { typing: true })
+      convo.say(`Nope! That Pokémon is actually #${randomID}`, options)
         .then(() => convo.say(`Your score was: ${score}. Type START to play again!`))
         .then(() => convo.end());
     }
@@ -39,12 +41,16 @@ const askPokemon = (convo) => {
 };
 
 const newGameMenu = (payload, chat) => {
-  chat.say(`Let's see how much you know about Pokémon...`, { typing: true })
+  const message = `Let's see how much you know about Pokémon...`;
+  const options = { typing: true };
+  chat.say(message, options)
     .then(() => chat.conversation(askPokemon));
 };
 
 const helpMenu = (payload, chat) => {
-  chat.say(`Just type START or PLAY to get started!`, { typing : true });
+  const message = `Just type START or PLAY to get started!`;
+  const options = { typing: true };
+  chat.say(message, options);
 };
 
 bot.hear([`start`, `play`, /let(')?s play/i], newGameMenu);
@@ -52,8 +58,12 @@ bot.hear([`start`, `play`, /let(')?s play/i], newGameMenu);
 bot.hear(['help', 'help me'], helpMenu);
 
 bot.setGetStartedButton((payload, chat) => {
-  chat.say(`Hey there, trainer! How well you think you know your Pokémon?.`, { typing: true })
-    .then(() => chat.say(`Type START or PLAY to join the challenge!`, { typing: true }));
+  const welcome1 = `Hey there, trainer! How well you think you know your Pokémon?`;
+  const welcome2 = `Type START or PLAY to join the challenge!`;
+  const options = { typing: true };
+
+  chat.say(welcome1, options)
+    .then(() => chat.say(welcome2, options));
 });
 
 bot.setPersistentMenu([
